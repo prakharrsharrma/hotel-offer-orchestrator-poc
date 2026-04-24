@@ -1,13 +1,13 @@
+import { supplierAHotels } from "../assets/supplierAHotels";
+import { supplierBHotels } from "../assets/supplierBHotels";
+import type { SupplierHotel } from "../temporal/types";
+
 export const SupplierService = {
-  getSupplierAHotels() {
-    return {
-      message: "Supplier A endpoint is available in phase 1.",
-    };
+  getSupplierAHotels(): SupplierHotel[] {
+    return supplierAHotels;
   },
 
-  getSupplierBHotels() {
-    return {
-      message: "Supplier B endpoint is available in phase 1.",
-    };
+  getSupplierBHotels(): SupplierHotel[] {
+    return supplierBHotels;
   },
 };

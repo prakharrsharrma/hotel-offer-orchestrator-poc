@@ -33,6 +33,8 @@ function upsertBestHotel(
 
 export async function getFilteredHotelsWorkflow(
   city: string,
+  minPrice: number,
+  maxPrice: number,
 ): Promise<NormalizedHotel[]> {
   const [supplierAHotels, supplierBHotels] = await Promise.all([
     fetchSupplierA(city),
@@ -49,5 +51,7 @@ export async function getFilteredHotelsWorkflow(
     upsertBestHotel(bestHotelsByName, hotel, "Supplier B");
   }
 
-  return Array.from(bestHotelsByName.values());
+  return Array.from(bestHotelsByName.values()).filter(
+    (hotel) => hotel.price >= minPrice && hotel.price <= maxPrice,
+  );
 }

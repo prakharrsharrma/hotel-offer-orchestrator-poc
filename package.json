@@ -1,0 +1,39 @@
+{
+  "name": "hotel-offer-orchestrator-poc",
+  "version": "1.0.0",
+  "description": "A high-performance orchestrator that aggregates supplier data , deduplicates hotels , and serves the best-priced offers via Redis.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prakharrsharrma/hotel-offer-orchestrator-poc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/prakharrsharrma/hotel-offer-orchestrator-poc/issues"
+  },
+  "homepage": "https://github.com/prakharrsharrma/hotel-offer-orchestrator-poc#readme",
+  "dependencies": {
+    "@temporalio/activity": "^1.16.1",
+    "@temporalio/client": "^1.16.1",
+    "@temporalio/worker": "^1.16.1",
+    "@temporalio/workflow": "^1.16.1",
+    "express": "^5.2.1",
+    "ioredis": "^5.10.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}

@@ -4,7 +4,7 @@ import { apiRouter } from "./api/routes";
 import { errorMiddleware } from "./api/middlewares/errorMiddleware";
 
 const app = express();
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 8000;
 
 app.use(express.json());
 app.use(apiRouter);

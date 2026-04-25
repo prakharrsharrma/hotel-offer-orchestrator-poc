@@ -1,41 +1,88 @@
+version: '3.8'
+
+# Define a custom network for isolated communication
+networks:
+  hotel-network:
+    driver: bridge
+
+# Define persistent storage for stateful services
+volumes:
+  temporal-db-data:
+  redis-data:
+
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: hotel-offer-app
-    environment:
-      PORT: 8000
-      TEMPORAL_ADDRESS: temporal:7233
-      TEMPORAL_NAMESPACE: default
-      TEMPORAL_TASK_QUEUE: hotel-offers-task-queue
-      REDIS_URL: redis://redis:6379
     ports:
       - "8000:8000"
+    environment:
+      - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    networks:
+      - hotel-network
     depends_on:
-      - temporal
-      - redis
+      temporal:
+        condition: service_started
+      redis:
+        condition: service_started
 
   worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: hotel-offer-worker
-    command: npm run start:worker
+    command: node dist/temporal/worker.js
+    restart: unless-stopped
     environment:
-      TEMPORAL_ADDRESS: temporal:7233
-      TEMPORAL_NAMESPACE: default
-      TEMPORAL_TASK_QUEUE: hotel-offers-task-queue
-      SUPPLIER_BASE_URL: http://app:8000
+      - TEMPORAL_ADDRESS=${TEMPORAL_ADDRESS:-temporal:7233}
+      - SUPPLIER_BASE_URL=${SUPPLIER_BASE_URL:-http://app:8000}
+      - TEMPORAL_CONNECT_ATTEMPTS=180
+      - TEMPORAL_CONNECT_RETRY_MS=2000
+    networks:
+      - hotel-network
     depends_on:
-      - temporal
-      - app
+      temporal:
+        condition: service_started
+
+  db:
+    image: postgres:12-alpine
+    container_name: hotel-offer-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - temporal-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   temporal:
-    image: temporalio/auto-setup:latest
+    image: temporalio/auto-setup:1.22.0
     container_name: hotel-offer-temporal
     ports:
       - "7233:7233"
+      - "8080:8080" # Temporal UI
+    environment:
+      - DB=postgres12
+      - DB_PORT=${POSTGRES_DB_PORT:-5432}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PWD=${POSTGRES_PASSWORD}
+      - POSTGRES_SEEDS=db
+    networks:
+      - hotel-network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "tctl", "--address", "localhost:7233", "cluster", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
 
   redis:
     image: redis:7-alpine
@@ -44,6 +91,5 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-
-volumes:
-  redis-data:
+    networks:
+      - hotel-network

@@ -3,23 +3,6 @@ import { Context } from "@temporalio/activity";
 import type { SupplierHotel } from "./types";
 import { SUPPLIER_A_URL, SUPPLIER_B_URL } from "../constants";
 
-function isSupplierHotel(value: unknown): value is SupplierHotel {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  const candidate = value as Record<string, unknown>;
-  return (
-    typeof candidate.hotelId === "string" &&
-    typeof candidate.name === "string" &&
-    typeof candidate.price === "number" &&
-    Number.isFinite(candidate.price) &&
-    typeof candidate.city === "string" &&
-    typeof candidate.commissionPct === "number" &&
-    Number.isFinite(candidate.commissionPct)
-  );
-}
-
 function parseSupplierHotels(
   payload: unknown,
   supplierName: string,
@@ -28,15 +11,7 @@ function parseSupplierHotels(
     throw new Error(`${supplierName} response is not an array`);
   }
 
-  const hotels: SupplierHotel[] = [];
-  for (const item of payload) {
-    if (!isSupplierHotel(item)) {
-      throw new Error(`${supplierName} returned invalid hotel data`);
-    }
-    hotels.push(item);
-  }
-
-  return hotels;
+  return payload as SupplierHotel[];
 }
 
 async function fetchSupplierHotels(

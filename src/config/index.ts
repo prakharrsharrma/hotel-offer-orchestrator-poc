@@ -7,3 +7,5 @@ export const TEMPORAL_CONFIG = {
 };
 
 export const CACHE_TTL = process.env.CACHE_TTL || 600;
+
+export { default as temporalClient } from "./temporalClient";

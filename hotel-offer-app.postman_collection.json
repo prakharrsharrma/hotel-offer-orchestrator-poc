@@ -1,0 +1,178 @@
+{
+  "info": {
+    "_postman_id": "3fc131de-2923-4618-ad0d-37206b5d7e3d",
+    "name": "Hotel Offer Orchestrator",
+    "description": "Collection to test Temporal orchestration, Redis filtering, and mock suppliers.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53943820",
+    "_collection_link": "https://go.postman.co/collection/53943820-3fc131de-2923-4618-ad0d-37206b5d7e3d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Debug",
+      "item": [
+        {
+          "name": "Supplier B Mock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/supplierB/hotels?city=delhi",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "supplierB",
+                "hotels"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "delhi"
+                }
+              ]
+            },
+            "description": "Directly hit Mock Supplier B. [cite: 44]"
+          },
+          "response": []
+        },
+        {
+          "name": "Supplier A Mock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/supplierA/hotels?city=delhi",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "supplierA",
+                "hotels"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "delhi"
+                }
+              ]
+            },
+            "description": "Directly hit Mock Supplier A. [cite: 43]"
+          },
+          "response": []
+        },
+        {
+          "name": "City with No Results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/hotels?city=atlantis",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "atlantis"
+                }
+              ]
+            },
+            "description": "Should return an empty array gracefully. [cite: 61]"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Hotel",
+      "item": [
+        {
+          "name": "Get Hotels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/hotels?city=delhi&minPrice=2000&maxPrice=6000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hotels"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "delhi"
+                },
+                {
+                  "key": "minPrice",
+                  "value": "2000"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "6000"
+                }
+              ]
+            },
+            "description": "Tests the Redis ZSET filtering logic. [cite: 23, 25]"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Checks health of the orchestrator and its connection to suppliers. [cite: 71]"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    }
+  ]
+}

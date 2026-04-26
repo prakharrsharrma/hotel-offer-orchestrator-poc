@@ -1,27 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 
+import { parseOptionalNumberQueryParam } from "../../helpers";
 import { hotelsService } from "../../services/hotelService";
 import { HttpError } from "../../types";
-
-function parseOptionalNumberQueryParam(
-  value: unknown,
-  paramName: string,
-): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  if (typeof value !== "string" || value.trim().length === 0) {
-    throw new HttpError(400, `Query parameter '${paramName}' must be a number`);
-  }
-
-  const parsed = Number(value);
-  if (Number.isNaN(parsed)) {
-    throw new HttpError(400, `Query parameter '${paramName}' must be a number`);
-  }
-
-  return parsed;
-}
 
 export const getHotels = async (
   request: Request,
@@ -59,7 +40,7 @@ export const getHotels = async (
       minPrice,
       maxPrice,
     );
-    response.status(200).json(hotels);
+    response.status(200).json({ hotels, count: hotels.length });
   } catch (error) {
     next(error);
   }

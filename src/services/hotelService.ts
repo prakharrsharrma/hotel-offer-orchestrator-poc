@@ -1,30 +1,10 @@
-import { Client, Connection } from "@temporalio/client";
-
-import { TEMPORAL_CONFIG } from "../config";
+import { TEMPORAL_CONFIG, temporalClient } from "../config";
 import type { NormalizedHotel } from "../temporal/types";
 import * as workflows from "../temporal/workflows";
 import { cacheService } from "./cacheService";
 
 const DEFAULT_MIN_PRICE = 0;
 const DEFAULT_MAX_PRICE = Number.MAX_SAFE_INTEGER;
-
-let temporalClientPromise: Promise<Client> | undefined;
-
-async function getTemporalClient(): Promise<Client> {
-  if (!temporalClientPromise) {
-    temporalClientPromise = Connection.connect({
-      address: TEMPORAL_CONFIG.ADDRESS,
-    }).then(
-      (connection) =>
-        new Client({
-          connection,
-          namespace: TEMPORAL_CONFIG.NAMESPACE,
-        }),
-    );
-  }
-
-  return temporalClientPromise;
-}
 
 export const hotelsService = {
   async getHotelsByCity(
@@ -45,9 +25,9 @@ export const hotelsService = {
       return cachedHotels;
     }
 
-    const workflowClient = await getTemporalClient();
+    const temporalWorkflowClient = await temporalClient.getClient();
 
-    const hotels = await workflowClient.workflow.execute(
+    const hotels = await temporalWorkflowClient.workflow.execute(
       workflows.getFilteredHotelsWorkflow,
       {
         taskQueue: TEMPORAL_CONFIG.TASK_QUEUE,
